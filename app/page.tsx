@@ -1,131 +1,308 @@
-import React from 'react';
-import { 
-  LayoutDashboard, UserCircle, FileText, Video, Search, 
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import {
+  LayoutDashboard, UserCircle, FileText, Video, Search,
   ClipboardList, BookOpen, Settings, Bell, Mail, TrendingUp
 } from 'lucide-react';
 
+const AVATAR_STORAGE_KEY = 'profileAvatarUrl';
+const DEFAULT_AVATAR = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver&topType=ShortHairShortFlat&accessoriesType=Prescription02&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&clotheColor=Gray01&skinColor=Light';
+
 export default function Dashboard() {
+  const [headerAvatarUrl, setHeaderAvatarUrl] = useState(DEFAULT_AVATAR);
+
+  useEffect(() => {
+    try {
+      const stored = typeof window !== 'undefined' ? localStorage.getItem(AVATAR_STORAGE_KEY) : null;
+      if (stored) setHeaderAvatarUrl(stored);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === AVATAR_STORAGE_KEY && e.newValue) setHeaderAvatarUrl(e.newValue);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+  const menuItems = [
+    { name: 'ダッシュボード', icon: LayoutDashboard, active: true, href: '/' },
+    { name: 'プロフィール編集', icon: UserCircle, href: '/profile' },
+    { name: '書類自動添削', icon: FileText, href: '/document-check' },
+    { name: 'AI面接対策', icon: Video, href: '#' },
+    { name: '求人検索', icon: Search, href: '#' },
+    { name: '選考管理', icon: ClipboardList, href: '#' },
+    { name: '企業コラム', icon: BookOpen, href: '#' },
+    { name: '設定', icon: Settings, href: '#' },
+  ];
+
+  const scorePercent = 88;
+  const circumference = 2 * Math.PI * 50;
+  const strokeDashoffset = circumference * (1 - scorePercent / 100);
+
   return (
-    <div className="flex h-screen bg-gray-100 text-slate-800 font-sans">
-      {/* サイドバー（ダークネイビー） */}
-      <aside className="w-64 bg-[#1a2233] text-gray-300 flex flex-col">
-        <div className="p-6 text-xl font-bold text-white flex items-center gap-2">
-          <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-white text-xs">C</div> 
-          Candidate
+    <div
+      className="flex h-screen font-sans text-white min-h-screen"
+      style={{
+        background: 'linear-gradient(160deg, #1a1f26 0%, #222b36 40%, #1e252e 100%)',
+      }}
+    >
+      {/* サイドバー（より深いダーク） */}
+      <aside
+        className="w-64 flex-shrink-0 flex flex-col"
+        style={{ background: 'linear-gradient(180deg, #0f1218 0%, #151a22 100%)' }}
+      >
+        <div className="p-9 text-xl font-extrabold flex items-center gap-3 tracking-wider">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-extrabold shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, #c5a059 0%, #92713e 100%)',
+              boxShadow: '0 4px 14px rgba(197, 160, 89, 0.35)',
+            }}
+          >
+            C
+          </div>
+          <span className="text-white">Candidate</span>
         </div>
-        <nav className="flex-1 px-4 space-y-1">
-          {[
-            { name: 'ダッシュボード', icon: LayoutDashboard, active: true },
-            { name: 'プロフィール編集', icon: UserCircle },
-            { name: '書類自動添削', icon: FileText },
-            { name: 'AI面接対策', icon: Video },
-            { name: '求人検索', icon: Search },
-            { name: '選考管理', icon: ClipboardList },
-            { name: '企業コラム', icon: BookOpen },
-            { name: '設定', icon: Settings },
-          ].map((item) => (
-            <div key={item.name} className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${item.active ? 'bg-white/10 text-white' : 'hover:bg-white/5 hover:text-white'}`}>
-              <item.icon size={18} />
+        <nav className="flex-1 px-5 py-4 space-y-1.5">
+          {menuItems.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-200 ${
+                item.active
+                  ? 'text-white shadow-lg'
+                  : 'text-[#94a3b8] hover:bg-white/5 hover:text-white'
+              }`}
+              style={
+                item.active
+                  ? {
+                      background: 'linear-gradient(135deg, #c5a059 0%, #92713e 100%)',
+                      boxShadow: '0 4px 14px rgba(197, 160, 89, 0.25)',
+                    }
+                  : undefined
+              }
+            >
+              <item.icon size={20} className="flex-shrink-0" strokeWidth={1.5} />
               <span className="text-sm font-medium">{item.name}</span>
-            </div>
+            </Link>
           ))}
         </nav>
       </aside>
 
       {/* メインエリア */}
-      <main className="flex-1 overflow-y-auto p-8">
-        {/* ヘッダー */}
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">PC ダッシュボード</h1>
-          <div className="flex items-center gap-6 text-gray-400">
-            <Mail size={20} className="hover:text-gray-600 cursor-pointer" />
-            <Bell size={20} className="hover:text-gray-600 cursor-pointer" />
-            <div className="flex items-center gap-2 border-l pl-6">
-              <span className="text-sm font-medium text-gray-600">田畑 誠一</span>
-              <div className="w-9 h-9 bg-gray-300 rounded-full border-2 border-white shadow-sm overflow-hidden">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="avatar" />
+      <main className="flex-1 overflow-y-auto">
+        {/* ヘッダー（透過・高級感） */}
+        <header className="sticky top-0 z-10 flex justify-between items-center px-12 py-7 mb-12 bg-[#1a1f26]/70 backdrop-blur-md border-b border-white/5">
+          <h1 className="text-2xl font-extrabold text-white tracking-widest">PC ダッシュボード</h1>
+          <div className="flex items-center gap-8 text-[#94a3b8]">
+            <Mail size={22} className="hover:text-[#c5a059] cursor-pointer transition-colors" strokeWidth={1.5} />
+            <div className="relative">
+              <Bell size={22} className="hover:text-[#c5a059] cursor-pointer transition-colors" strokeWidth={1.5} />
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
+                3
+              </span>
+            </div>
+            <div className="flex items-center gap-3 border-l border-white/10 pl-8">
+              <span className="text-sm font-extrabold text-white tracking-wider">田畑 誠一</span>
+              <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-[#c5a059]/40 shadow-lg">
+                <img src={headerAvatarUrl} alt="avatar" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
         </header>
 
-        {/* コンテンツ上部：スコアとスカウト */}
-        <div className="grid grid-cols-12 gap-6 mb-8">
-          <div className="col-span-8 bg-[#1e293b] text-white p-8 rounded-3xl shadow-xl relative overflow-hidden">
-            <div className="relative z-10">
-              <h3 className="text-lg font-semibold mb-6 opacity-80">AI面接トレーニング＆スカウト状況</h3>
-              <div className="flex items-center gap-12">
-                <div className="text-center">
-                  <p className="text-sm opacity-60 mb-2">候補者スコア</p>
-                  <div className="relative inline-flex items-center justify-center">
-                    <svg className="w-32 h-32">
-                      <circle className="text-gray-700" strokeWidth="8" stroke="currentColor" fill="transparent" r="50" cx="64" cy="64" />
-                      <circle className="text-amber-400" strokeWidth="8" strokeDasharray={314} strokeDashoffset={314 * (1 - 0.88)} strokeLinecap="round" stroke="currentColor" fill="transparent" r="50" cx="64" cy="64" />
-                    </svg>
-                    <div className="absolute flex flex-col items-center">
-                      <span className="text-4xl font-bold">S</span>
-                      <span className="text-xs opacity-60">88/100</span>
+        <div className="px-12 pb-14">
+          {/* コンテンツ上部：スコアとスカウト */}
+          <div className="grid grid-cols-12 gap-10 mb-14">
+            {/* 候補者スコア・トレンドカード（ガラスモーフィズム＋ゴールドボーダー） */}
+            <div
+              className="col-span-8 rounded-3xl relative overflow-hidden border border-[#c5a059]/25"
+              style={{
+                background: 'linear-gradient(145deg, rgba(43, 51, 65, 0.85) 0%, rgba(34, 43, 54, 0.9) 100%)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)',
+              }}
+            >
+              <div className="p-12">
+                <h3 className="text-lg font-semibold text-[#94a3b8] mb-10 tracking-wider">
+                  AI面接トレーニング＆スカウト状況
+                </h3>
+                <div className="flex items-center gap-16">
+                  <div className="text-center">
+                    <p className="text-sm text-[#94a3b8] mb-5 uppercase tracking-wider">候補者スコア</p>
+                    <div className="relative inline-flex items-center justify-center">
+                      <svg className="w-36 h-36 drop-shadow-[0_0_12px_rgba(197,160,89,0.5)]" viewBox="0 0 128 128">
+                        <circle
+                          className="text-white/10"
+                          strokeWidth="10"
+                          stroke="currentColor"
+                          fill="transparent"
+                          r="50"
+                          cx="64"
+                          cy="64"
+                        />
+                        <circle
+                          className="transition-all duration-700"
+                          strokeWidth="10"
+                          strokeDasharray={circumference}
+                          strokeDashoffset={strokeDashoffset}
+                          strokeLinecap="round"
+                          stroke="url(#goldGradient)"
+                          fill="transparent"
+                          r="50"
+                          cx="64"
+                          cy="64"
+                          style={{
+                            filter: 'drop-shadow(0 0 8px rgba(197, 160, 89, 0.6))',
+                          }}
+                        />
+                        <defs>
+                          <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#c5a059" />
+                            <stop offset="100%" stopColor="#92713e" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute flex flex-col items-center">
+                        <span className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-b from-[#c5a059] to-[#92713e]">S</span>
+                        <span className="text-sm font-semibold mt-1 bg-clip-text text-transparent bg-gradient-to-b from-[#c5a059] to-[#92713e]">88/100</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-center gap-2 mt-4">
+                      <span className="w-2 h-2 rounded-full bg-[#c5a059] shadow-[0_0_8px_#c5a059]" title="Sランク" />
+                      <span className="w-2 h-2 rounded-full bg-orange-400/80" title="Bランク" />
+                      <span className="w-2 h-2 rounded-full bg-sky-400/80" title="3ランク" />
                     </div>
                   </div>
+                  <div
+                    className="flex-1 h-36 rounded-2xl flex items-center justify-center border border-white/10"
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+                    }}
+                  >
+                    <TrendingUp
+                      size={48}
+                      className="text-[#c5a059] flex-shrink-0"
+                      strokeWidth={1.5}
+                      style={{ filter: 'drop-shadow(0 0 10px rgba(197, 160, 89, 0.5))' }}
+                    />
+                    <span className="text-sm text-[#94a3b8] ml-4 italic">トレンドグラフ表示エリア</span>
+                  </div>
                 </div>
-                <div className="flex-1 h-32 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10">
-                  <TrendingUp className="text-amber-400 mr-2" />
-                  <span className="text-sm opacity-50 italic font-light">トレンドグラフ表示エリア</span>
+              </div>
+            </div>
+
+            {/* 新着スカウトカード */}
+            <div
+              className="col-span-4 rounded-3xl relative overflow-hidden border border-[#c5a059]/25 flex flex-col justify-between p-12"
+              style={{
+                background: 'linear-gradient(165deg, rgba(43, 51, 65, 0.9) 0%, rgba(34, 43, 54, 0.95) 100%)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)',
+              }}
+            >
+              <div className="flex justify-between items-start">
+                <div
+                  className="p-3.5 rounded-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.2) 0%, rgba(146, 113, 62, 0.15) 100%)',
+                    boxShadow: '0 0 20px rgba(197, 160, 89, 0.15)',
+                  }}
+                >
+                  <Bell size={24} className="text-[#c5a059]" strokeWidth={1.5} />
                 </div>
+                <span className="bg-red-500/90 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider text-white">
+                  New
+                </span>
+              </div>
+              <div>
+                <h3 className="text-xl font-extrabold text-white tracking-wider mb-3">新着スカウト：<span className="bg-clip-text text-transparent bg-gradient-to-b from-[#c5a059] to-[#92713e]">3</span>件</h3>
+                <p className="text-sm text-[#94a3b8] mb-10">優良企業からのスカウトが届いています</p>
+                <button
+                  className="w-full py-4 rounded-2xl font-bold text-white transition-all duration-300 active:scale-[0.98] hover:shadow-[0_0_28px_rgba(197,160,89,0.45)]"
+                  style={{
+                    background: 'linear-gradient(180deg, #c5a059 0%, #92713e 100%)',
+                    boxShadow: '0 4px 20px rgba(197, 160, 89, 0.3)',
+                  }}
+                >
+                  スカウトを確認
+                </button>
               </div>
             </div>
           </div>
 
-          <div className="col-span-4 bg-gradient-to-br from-indigo-600 to-purple-700 text-white p-8 rounded-3xl shadow-xl flex flex-col justify-between">
-            <div className="flex justify-between items-start">
-              <div className="p-3 bg-white/20 rounded-2xl"><Bell className="text-amber-300" /></div>
-              <span className="bg-red-500 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">New</span>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-1">新着スカウト：3件</h3>
-              <p className="text-sm opacity-70 mb-6">優良企業からのスカウトが届いています</p>
-              <button className="w-full bg-amber-400 hover:bg-amber-300 text-indigo-900 py-3 rounded-2xl font-bold transition-all shadow-lg active:scale-95">
-                スカウトを確認
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* 選考ステータス */}
-        <div className="grid grid-cols-12 gap-6">
-           <div className="col-span-9 grid grid-cols-3 gap-4">
-              {['A社：一次面接通過', 'B社：最終面接調整中', 'C社：最終面接調整中'].map((title, i) => (
-                <div key={i} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:border-indigo-200 transition-colors cursor-pointer group">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">{title.split('：')[1]}</p>
-                  <h4 className="font-bold text-gray-700 mb-4">{title.split('：')[0]}</h4>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className={`h-full bg-indigo-500 rounded-full w-[${(i+1)*30}%]`}></div>
+          {/* 選考ステータス & ToDo */}
+          <div className="grid grid-cols-12 gap-10">
+            <div className="col-span-9 grid grid-cols-3 gap-7">
+              {[
+                { company: 'A社', stage: '一次面接通過', progress: 30 },
+                { company: 'B社', stage: '最終面接調整中', progress: 60 },
+                { company: 'C社', stage: '最終面接調整中', progress: 90 },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="rounded-3xl p-7 cursor-pointer transition-all duration-200 border border-[#c5a059]/20 hover:border-[#c5a059]/40 hover:shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
+                  style={{
+                    background: 'linear-gradient(145deg, rgba(43, 51, 65, 0.8) 0%, rgba(34, 43, 54, 0.85) 100%)',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03)',
+                  }}
+                >
+                  <p className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest mb-3">{item.stage}</p>
+                  <h4 className="font-bold text-white text-lg mb-5">{item.company}</h4>
+                  <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${item.progress}%`,
+                        background: 'linear-gradient(90deg, #c5a059 0%, #92713e 100%)',
+                        boxShadow: '0 0 12px rgba(197, 160, 89, 0.5)',
+                      }}
+                    />
                   </div>
                 </div>
               ))}
-           </div>
-           
-           {/* ToDoリスト */}
-           <div className="col-span-3 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-             <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-               <ClipboardList size={18} className="text-indigo-500" /> ToDoリスト
-             </h3>
-             <ul className="space-y-3">
-               {[
-                 { task: "A社 適性検査", date: "10/25", urgent: true },
-                 { task: "B社 履歴書提出", date: "10/26", urgent: false },
-                 { task: "C社 面接準備", date: "10/28", urgent: false },
-               ].map((todo, i) => (
-                 <li key={i} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0">
-                   <div className="flex items-center gap-2">
-                     <input type="checkbox" className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                     <span className={`text-xs ${todo.urgent ? 'text-red-500 font-bold' : 'text-gray-600'}`}>{todo.task}</span>
-                   </div>
-                   <span className="text-[10px] text-gray-400 font-mono">{todo.date}</span>
-                 </li>
-               ))}
-             </ul>
-           </div>
+            </div>
+
+            {/* ToDoリスト */}
+            <div
+              className="col-span-3 rounded-3xl p-9 border border-[#c5a059]/20"
+              style={{
+                background: 'linear-gradient(145deg, rgba(43, 51, 65, 0.85) 0%, rgba(34, 43, 54, 0.9) 100%)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.03)',
+              }}
+            >
+              <h3 className="font-extrabold text-white mb-7 flex items-center gap-2 text-base tracking-wider">
+                <ClipboardList size={20} className="text-[#c5a059] flex-shrink-0" strokeWidth={1.5} />
+                ToDoリスト
+              </h3>
+              <ul className="space-y-1.5">
+                {[
+                  { task: 'A社 適性検査受〆切', date: '10/25', urgent: true },
+                  { task: 'B社 履歴書提出', date: '10/26', urgent: false },
+                  { task: 'C社 面接準備', date: '10/28', urgent: false },
+                ].map((todo, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center justify-between py-5 px-4 rounded-xl hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        className="rounded border-white/30 bg-white/5 text-[#c5a059] focus:ring-[#c5a059]/50"
+                      />
+                      <span className={`text-sm ${todo.urgent ? 'text-amber-400 font-semibold' : 'text-[#94a3b8]'}`}>
+                        {todo.task}
+                      </span>
+                    </div>
+                    <span className="text-xs text-[#94a3b8] font-mono">{todo.date}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </main>
     </div>
