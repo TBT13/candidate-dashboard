@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   LayoutDashboard, UserCircle, FileText, Video, Search,
-  ClipboardList, BookOpen, Settings, Bell, Mail, TrendingUp
+  ClipboardList, BookOpen, Settings, Bell, Mail, TrendingUp,
+  HeartHandshake
 } from 'lucide-react';
 
 const AVATAR_STORAGE_KEY = 'profileAvatarUrl';
@@ -34,6 +36,7 @@ export default function Dashboard() {
     { name: 'プロフィール編集', icon: UserCircle, href: '/profile' },
     { name: '書類自動添削', icon: FileText, href: '/document-check' },
     { name: 'AI面接対策', icon: Video, href: '#' },
+    { name: 'AIキャリアカウンセリング', icon: HeartHandshake, href: '/ai-counseling' },
     { name: '求人検索', icon: Search, href: '#' },
     { name: '選考管理', icon: ClipboardList, href: '#' },
     { name: '企業コラム', icon: BookOpen, href: '#' },
@@ -117,11 +120,11 @@ export default function Dashboard() {
         </header>
 
         <div className="px-12 pb-14">
-          {/* コンテンツ上部：スコアとスカウト */}
+          {/* コンテンツ上部：スコアとスカウト（左7 : 右5） */}
           <div className="grid grid-cols-12 gap-10 mb-14">
             {/* 候補者スコア・トレンドカード（ガラスモーフィズム＋ゴールドボーダー） */}
             <div
-              className="col-span-8 rounded-3xl relative overflow-hidden border border-[#c5a059]/25"
+              className="col-span-7 rounded-3xl relative overflow-hidden border border-[#c5a059]/25"
               style={{
                 background: 'linear-gradient(145deg, rgba(43, 51, 65, 0.85) 0%, rgba(34, 43, 54, 0.9) 100%)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)',
@@ -196,40 +199,83 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* 新着スカウトカード */}
-            <div
-              className="col-span-4 rounded-3xl relative overflow-hidden border border-[#c5a059]/25 flex flex-col justify-between p-12"
-              style={{
-                background: 'linear-gradient(165deg, rgba(43, 51, 65, 0.9) 0%, rgba(34, 43, 54, 0.95) 100%)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)',
-              }}
-            >
-              <div className="flex justify-between items-start">
-                <div
-                  className="p-3.5 rounded-2xl"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.2) 0%, rgba(146, 113, 62, 0.15) 100%)',
-                    boxShadow: '0 0 20px rgba(197, 160, 89, 0.15)',
-                  }}
-                >
-                  <Bell size={24} className="text-[#c5a059]" strokeWidth={1.5} />
+            {/* 右列：新着スカウト ＋ AI面接官カード（ゆとりある幅） */}
+            <div className="col-span-5 flex flex-col gap-6">
+              {/* 新着スカウトカード（微細パターン＋スポットライト） */}
+              <div
+                className="rounded-3xl relative overflow-hidden border border-[#c5a059]/25 flex flex-col justify-between p-8 sm:p-10 flex-1 min-h-0"
+                style={{
+                  background: 'linear-gradient(165deg, rgba(43, 51, 65, 0.92) 0%, rgba(34, 43, 54, 0.96) 100%), repeating-linear-gradient(45deg, transparent 0px, transparent 1px, rgba(197,160,89,0.02) 1px, rgba(197,160,89,0.02) 2px), radial-gradient(ellipse 120% 80% at 80% 20%, rgba(197,160,89,0.06) 0%, transparent 55%)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)',
+                }}
+              >
+                <div className="flex justify-between items-start">
+                  <div
+                    className="p-3.5 rounded-2xl"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(197, 160, 89, 0.2) 0%, rgba(146, 113, 62, 0.15) 100%)',
+                      boxShadow: '0 0 20px rgba(197, 160, 89, 0.15)',
+                    }}
+                  >
+                    <Bell size={24} className="text-[#c5a059]" strokeWidth={1.5} />
+                  </div>
+                  <span className="bg-red-500/90 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider text-white">
+                    New
+                  </span>
                 </div>
-                <span className="bg-red-500/90 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider text-white">
-                  New
-                </span>
+                <div>
+                  <h3 className="text-xl font-extrabold text-white tracking-wider mb-3">新着スカウト：<span className="bg-clip-text text-transparent bg-gradient-to-b from-[#c5a059] to-[#92713e]">3</span>件</h3>
+                  <p className="text-sm text-[#94a3b8] mb-10">優良企業からのスカウトが届いています</p>
+                  <button
+                    className="w-full py-4 rounded-2xl font-bold text-white transition-all duration-300 active:scale-[0.98] hover:shadow-[0_0_28px_rgba(197,160,89,0.45)]"
+                    style={{
+                      background: 'linear-gradient(180deg, #c5a059 0%, #92713e 100%)',
+                      boxShadow: '0 4px 20px rgba(197, 160, 89, 0.3)',
+                    }}
+                  >
+                    スカウトを確認
+                  </button>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-extrabold text-white tracking-wider mb-3">新着スカウト：<span className="bg-clip-text text-transparent bg-gradient-to-b from-[#c5a059] to-[#92713e]">3</span>件</h3>
-                <p className="text-sm text-[#94a3b8] mb-10">優良企業からのスカウトが届いています</p>
-                <button
-                  className="w-full py-4 rounded-2xl font-bold text-white transition-all duration-300 active:scale-[0.98] hover:shadow-[0_0_28px_rgba(197,160,89,0.45)]"
-                  style={{
-                    background: 'linear-gradient(180deg, #c5a059 0%, #92713e 100%)',
-                    boxShadow: '0 4px 20px rgba(197, 160, 89, 0.3)',
-                  }}
-                >
-                  スカウトを確認
-                </button>
+
+              {/* AI面接官とトレーニング開始カード（スポットライト背景・人物を下端に配置） */}
+              <div
+                className="rounded-3xl relative overflow-hidden border border-[#c5a059]/25 flex items-stretch min-h-[220px]"
+                style={{
+                  background: 'linear-gradient(165deg, rgba(43, 51, 65, 0.92) 0%, rgba(34, 43, 54, 0.96) 100%), repeating-linear-gradient(-35deg, transparent 0px, transparent 1px, rgba(197,160,89,0.02) 1px, rgba(197,160,89,0.02) 2px), radial-gradient(ellipse 100% 70% at 85% 30%, rgba(197,160,89,0.07) 0%, transparent 60%)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)',
+                }}
+              >
+                <div className="flex-1 flex flex-col justify-between p-6 sm:p-8 pr-2 min-w-0 z-10">
+                  <h3 className="text-lg font-extrabold text-white tracking-wider leading-snug">
+                    AI面接官とトレーニング開始
+                  </h3>
+                  <p className="text-sm text-[#94a3b8] mt-2 mb-5">面接はAI学習をして、AI面接でトレーニングしましょう。</p>
+                  <button
+                    className="w-fit py-3 px-6 rounded-2xl font-bold text-white transition-all duration-300 active:scale-[0.98] hover:shadow-[0_0_24px_rgba(217,180,100,0.5)]"
+                    style={{
+                      background: 'linear-gradient(180deg, #d4b85c 0%, #c5a059 35%, #a68b4a 100%)',
+                      boxShadow: '0 4px 20px rgba(197, 160, 89, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    今すぐ開始
+                  </button>
+                </div>
+                {/* AI面接官：Container（背景はカードのまま）→ スポットライト → 人物画像 */}
+                <div className="relative overflow-hidden w-36 sm:w-44 flex-shrink-0 self-stretch min-h-[200px] rounded-r-3xl">
+                  <div
+                    className="absolute inset-0 rounded-r-3xl bg-[radial-gradient(circle_at_center,_#374151_0%,_transparent_70%)] pointer-events-none"
+                    aria-hidden
+                  />
+                  <Image
+                    src="/ai-sensei.png"
+                    alt="AI面接官"
+                    fill
+                    priority
+                    sizes="(max-width: 640px) 176px, 176px"
+                    className="object-cover object-bottom"
+                  />
+                </div>
               </div>
             </div>
           </div>
